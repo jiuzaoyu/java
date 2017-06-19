@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/aop 
+        http://www.springframework.org/schema/aop/spring-aop-3.0.xsd   
+        http://www.springframework.org/schema/tx  
+        http://www.springframework.org/schema/tx/spring-tx-3.0.xsd ">
+
+
+	<!-- 导入JDBC属性文件 -->
+	<context:property-placeholder location="classpath:conf/jdbc.properties" />
+
+
+	<!-- 数据源配置   -->
+	<bean id="dataSource" class="com.changyou.erp.core.DataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<!-- <property name="password" value="${jdbc.password}" /> -->
+		<property name="maxActive" value="${jdbc.maxActive}" />
+		<property name="maxIdle" value="${jdbc.maxIdle}" />
+		<property name="testWhileIdle" value="true" />	
+		<property name="timeBetweenEvictionRunsMillis" value="3600000" />
+		<property name="validationQuery" value="select count(*) from dual" />
+		<property name="maxWait" value="${jdbc.maxWait}" />	
+		
+	</bean>
+
+
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="mappingDirectoryLocations"> 
+            <list>       
+            	<value>classpath:/com/changyou/erp/**/model</value>  
+            </list> 
+        </property> 		
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.show_sql">${jdbc.show_sql}</prop>
+				<prop key="hibernate.hbm2ddl.auto">true</prop>					
+				<prop key="hibernate.jdbc.batch_size">10</prop>	
+				<prop key="hibernate.connection.release_mode">auto</prop>		
+			</props>
+		</property>	
+		<!-- <property name="packagesToScan" value="com.changyou.erp.*.dao.hibernate"/>	 --> 
+	</bean>
+	<context:component-scan base-package="com.changyou.erp.**.dao.hibernate"/>
+		
+	<bean id="hibernateTemplate" class="org.springframework.orm.hibernate3.HibernateTemplate">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	 
+	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+	  <property name="sessionFactory" ref="sessionFactory"></property>
+	  <property name="dataSource" ref="dataSource"></property>
+	</bean>
+	 
+	 <!-- <bean id="jotm" class="com.changyou.erp.core.JotmFactoryBean" /> 
+	 <bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
+	 	<property name="userTransaction" ref="jotm"/>
+	 </bean>-->
+	<!-- 基本事务定义-->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>			
+			<tx:method name="get*" read-only="true"/>
+			<tx:method name="find*" read-only="true"/>
+			<!-- <tx:method name="*" propagation="REQUIRED" rollback-for="Exception"/> -->
+			
+			<tx:method name="*save*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="*Save*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="*add*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="*Add*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="*update*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="*Update*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="*del*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="*Del*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="*audit*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="*Audit*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="*checkApprove*" propagation="REQUIRED" rollback-for="Exception"/>	
+			<tx:method name="*complete*" propagation="REQUIRED" rollback-for="Exception"/>	
+			<tx:method name="*Complete*" propagation="REQUIRED" rollback-for="Exception"/>	
+			<tx:method name="*submit*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="*Submit*" propagation="REQUIRED" rollback-for="Exception"/>	
+			<tx:method name="*execute*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="*Execute*" propagation="REQUIRED" rollback-for="Exception"/>	
+			<tx:method name="*load*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="*Load*" propagation="REQUIRED" rollback-for="Exception"/>	
+			<tx:method name="backout" propagation="REQUIRED" rollback-for="Exception" />			
+			<tx:method name="scannerComplete" propagation="REQUIRES_NEW" rollback-for="Exception" />
+			<tx:method name="reSubmit*" propagation="REQUIRES_NEW" rollback-for="Exception" />
+            <tx:method name="reSave*" propagation="REQUIRES_NEW" rollback-for="Exception" />
+            <tx:method name="reject" propagation="REQUIRED" rollback-for="Exception"/>         
+            <tx:method name="getMonthStatisticsByHand" propagation="REQUIRED" rollback-for="Exception"/>              
+		</tx:attributes>
+	</tx:advice>
+	<!-- 自动创建事务代理 -->
+	<aop:config>
+	  <!-- <aop:advisor pointcut="execution(* com.changyou.erp.*.service.*Manager.*(..)) and execution(* com.changyou.erp.*.*.service.*Manager.*(..)) and !execution(* com.changyou.erp.workflow.service.*Manager.*(..))" advice-ref="txAdvice"/> -->
+	  <!-- aop:advisor pointcut="execution(* com.changyou.erp..service.*Manager.*(..)) and (!execution(* com.changyou.erp.workflow.service.*Manager.*(..)) and !execution(* com.changyou.erp.personal.service.*Manager.allComplete(..)) and !execution(* com.changyou.erp.personal.service.*Manager.allAssign(..)) ) "  advice-ref="txAdvice"/-->
+	     <aop:advisor pointcut="execution(* com.changyou.erp..service.*Manager.*(..)) and !execution(* com.changyou.erp.personal.service.*Manager.allComplete(..)) and !execution(* com.changyou.erp.personal.service.*Manager.allAssign(..)) ) "  advice-ref="txAdvice"/>
+	</aop:config>	
+</beans>

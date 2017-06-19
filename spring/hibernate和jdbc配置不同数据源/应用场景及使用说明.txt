@@ -1,0 +1,6 @@
+应用场景：
+	与其他系统对接时，要往其他系统中写入数据，如果使用jdbcTemplate在插入数据时操作起来比较麻烦不如hibernateTemplate使用简单，因此要根据不用的库建立不同的hibernateTemplate。
+使用说明：
+	1、先把不同数据库的连接信息配置好，如：jdbc.properties
+	2、根据不同的数据源配置不同的xml文件，mysql数据源，如：applicationContext-datasource-at.xml,oracle数据源，如：applicationContext-datasource-import-oracle.xml
+	3、在系统中进行调用，如：BxERPAndOracleManagerImpl.java

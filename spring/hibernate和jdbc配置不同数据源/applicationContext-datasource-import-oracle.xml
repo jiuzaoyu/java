@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/aop 
+        http://www.springframework.org/schema/aop/spring-aop-3.0.xsd   
+        http://www.springframework.org/schema/tx  
+        http://www.springframework.org/schema/tx/spring-tx-3.0.xsd ">
+       
+
+	<!-- 数据源配置   -->
+	<!-- 这里的class用来加载密码，见：DataSourceImportOracle.java-->
+	<bean id="importOracleDataSource" class="com.changyou.erp.core.DataSourceImportOracle" destroy-method="close">
+		<property name="driverClassName" value="${driverClass_importOracle}" />
+		<property name="url" value="${url_importOracle}" />
+		<property name="username" value="${username_importOracle}" />
+		<property name="maxActive" value="${jdbc.maxActive}" />
+		<property name="maxIdle" value="${jdbc.maxIdle}" />
+		<property name="maxWait" value="${jdbc.maxWait}" />		
+		<property name="testWhileIdle" value="true" />	
+		<property name="timeBetweenEvictionRunsMillis" value="3600000" />
+		<property name="validationQuery" value="select count(1) from dual" />
+	</bean>
+
+
+	<bean id="importOracleSessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="dataSource" ref="importOracleDataSource"/>
+		<property name="mappingDirectoryLocations"> 
+            <list>
+				<!--这里的classpath是用来配置要扫描的文件，即存放类和类与数据库对应关系的目录-->
+            	<value>classpath:/com/changyou/erp/model</value>             
+            </list> 
+        </property> 		
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.OracleDialect</prop>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.hbm2ddl.auto">false</prop>	
+				<!--<prop key="hibernate.connection.autocommit">true</prop> -->
+				<prop key="hibernate.jdbc.batch_size">10</prop>	
+				<prop key="hibernate.connection.release_mode">auto</prop>		
+			</props>
+		</property>	
+	</bean>
+		
+	<bean id="importOracleHibernateTemplate" class="org.springframework.orm.hibernate3.HibernateTemplate">
+		<property name="sessionFactory" ref="importOracleSessionFactory"></property>
+	</bean>	
+	<bean id="importOracleJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="importOracleDataSource"></property>
+	</bean>
+	 <bean id="importOracleTransactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+	  <property name="sessionFactory" ref="importOracleSessionFactory"></property>
+	</bean>
+	
+	
+	<tx:advice id="importOracleTxAdvice" transaction-manager="importOracleTransactionManager">
+		<tx:attributes>
+			<tx:method name="get*" read-only="true"/>
+			<tx:method name="find*" read-only="true"/>
+			<tx:method name="*" propagation="REQUIRED" rollback-for="Exception"/>
+		</tx:attributes>
+	</tx:advice>
+
+
+</beans>
