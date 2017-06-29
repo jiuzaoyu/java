@@ -85,24 +85,12 @@ public class BxCommonPageAction extends BaseAction{
 	private SystemStartManager systemStartManager;
 	@Resource
 	private AttachmentManager attachmentManager;
-	
-   	@RequestMapping(value = "/bx/showBxFinanceSubject.do",method={RequestMethod.GET, RequestMethod.POST})
-	public String showBxFinanceSubject(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception
-	{		
-    	String billCode = req.getParameter("billCode");
-    	if(billCode == null){
-    		logger.error("表单号不能为空！");
-    		return "errors/erpError";
-    	}
-    	//第一次打开时，按照规则初始化明细的财务信息
-    	bxBillCommonManager.initBxDetailFinanceInfo(billCode);
-    	List<BxFinanceSubjectDetail> list = bxBillCommonManager.getFinanceSubjectDetailByBillCode(billCode);
-		model.put("list", list);
-		model.put("isInit", "true");
-		return "bx/bx_finance_subject";
-	}
    
-    
+    	/*3、这个@ResponseBody必须得加上，否则select2远程调用无法获取后台回馈的数据
+	@responsebody表示该方法的返回结果直接写入HTTP response body中
+        一般在异步获取数据时使用，在使用@RequestMapping后，返回值通常解析为跳转路径，加上@responsebody后返回结果不会被解析为跳转路径，
+	而是直接写入HTTP response body中。比如异步获取json数据，加上@responsebody后，会直接返回json数据。*/
+	
     	@ResponseBody
     	@RequestMapping(value = "/bx/queryBxItem.do",method={RequestMethod.GET, RequestMethod.POST})
 	public List<JSONObject> queryBxItem(HttpServletRequest req, HttpServletResponse res) throws Exception
@@ -112,6 +100,9 @@ public class BxCommonPageAction extends BaseAction{
         List<JSONObject> rList=new ArrayList<JSONObject>();
         for(BxFinanceSubjectWord bw:list){
         	JSONObject json=new JSONObject();
+		/*
+		4、封装select2后台反馈给前台的数据时，必须用id和text,否则select2无法展示。
+		*/
         	json.put("id", bw.getItemCode());
         	json.put("text", bw.getItemName());
         	rList.add(json);
