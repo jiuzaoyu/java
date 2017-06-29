@@ -5,12 +5,14 @@
  String basePath = request.getContextPath();
  %>
  <head>
- 	<%-- <link rel="stylesheet" href="<%=basePath%>/js/select/bootstrap.min.css" type="text/css" /> --%> 
- 	 
- 	<link rel="stylesheet" href="<%=basePath%>/js/select/select2.min.css" type="text/css" />
- 	<%-- <script type="text/javascript" src="<%=basePath%>/js/select/jquery-1.11.1.min.js"></script> --%>
- 	<%-- <script type="text/javascript" src="<%=basePath%>/js/select/bootstrap.min.js"></script> --%>
-    
+	select2的使用心得：
+	1、要使用select2必须引入select2的插件，即下面四个文件，如果项目中已经引入jquery就无需引入；
+	2、select2的控件如果放在dialog的弹框中，此时select2会失效，需要修改最外层弹框的zIndex属性，这里的最外层指：如erp中，先点审批弹出审批页面,
+	   再点审批页面中的确认财务科目，弹出修改财务科目的页面，select2运用在修改财务科目的页面，这里要修改zIndex,只要修改审批按钮的弹框属性即可，
+	   erp项目中是改成了zIndex:100。
+ 	
+        <link rel="stylesheet" href="<%=basePath%>/js/select/select2.min.css" type="text/css" />
+	<script type="text/javascript" src="<%=basePath%>/js/select/jquery-1.11.1.min.js"></script>
  	<script type="text/javascript" src="<%=basePath%>/js/select/select2.min.js"></script>
  	<script type="text/javascript" src="<%=basePath%>/js/select/zh-CN.js"></script>
 
@@ -45,6 +47,7 @@
 					<tr  style="text-align:center;">
 						<input type="hidden" name="fsId" value="${bxFsDetail.fsId}"/>
 						<td>
+							<!--select2被使用的地方-->	
 							<select id="subSubjectName" name="subSubjectName" onchange="updateSubSubjectCode($(this));"> 
 							</select> 
 							<input type="hidden" style="width:50px;" name="fsSubSubjectName" value="${bxFsDetail.fsSubSubjectName}"/>
@@ -70,36 +73,36 @@
 <script>
 	$(document).ready(function() {
  		var $element_subSubjectName=$("select[name='subSubjectName']").select2({
-			language : 'zh-CN',
-			minimumInputLength : 1, //至少输入n个字符，才去加载数据
-			maximumInputLength : 100,//限制最大字符，以防坑货
-			placeholder : "选择报销条目",
-			width : '200px',
-			allowClear : false,
-			multiple : false,
-			ajax : {
-				url : "<%=basePath%>/bx/queryBxItem.do",
-				dataType : "json",
-				delay : 250,
-				type:"POST",
-				data : function(params) {
-					return {
-						term : params.term
-					};
-				},
-				processResults : function(data, params) {
-					var parsed = data;
-					var arr = [];
-					for ( var x in parsed) {
-						arr.push(parsed[x]); //这个应该是个json对象
-					}
-					console.log(arr);
-					return {
-						results : arr
-					};
-				},
-				cache : true
-			}
+		language : 'zh-CN',
+		minimumInputLength : 1, //至少输入n个字符，才去加载数据
+		maximumInputLength : 100,//限制最大字符，以防坑货
+		placeholder : "选择报销条目",
+		width : '200px',
+		allowClear : false,
+		multiple : false,
+		ajax : {
+			url : "<%=basePath%>/bx/queryBxItem.do",
+			dataType : "json",
+			delay : 250,
+			type:"POST",
+			data : function(params) {
+				return {
+					term : params.term
+				};
+			},
+			processResults : function(data, params) {
+				var parsed = data;
+				var arr = [];
+				for ( var x in parsed) {
+					arr.push(parsed[x]); //这个应该是个json对象
+				}
+				console.log(arr);
+				return {
+					results : arr
+				};
+			},
+			cache : true
+		}
 		}).on("select2:select", function (e) {
 			//
 		});
@@ -111,145 +114,5 @@
 		var subSubjectNameValue = currobj.text();
 		currobj.parent().parent().find("input[name='fsSubSubjectCode']").val(subSubjectNameKey);
 		currobj.parent().parent().find("input[name='fsSubSubjectName']").val(subSubjectNameValue);
-	}
-	
-	
-	function addFsRow(){
-		 
-		 var tr = $("<tr style=\"text-align:center;\">");
-		 $("<input>").attr({
-				name : "fsId",
-				type : "hidden",
-				value : ""
-			 }).appendTo(tr);
-		 var td = $("<td>");
-		 $("<select>").attr({
-			 	id : "subSubjectName",
-				name : "subSubjectName",
-				onchange : "updateSubSubjectCode($(this));"
-			 }).appendTo(td);
-		 $("<input>").attr({
-				name : "fsSubSubjectName",
-				type : "hidden",
-				style : "width:50px;",
-				value : ""
-			 }).appendTo(td);
-		 td.appendTo(tr);
-		 var td = $("<td>");
-		 $("<input>").attr({
-				name : "fsSubSubjectCode",
-				type : "text",
-				style : "width:50px;",
-				value : ""
-			 }).appendTo(td);
-			td.appendTo(tr);
-		 var td = $("<td>");	
-		 $("<input>").attr({
-				name : "fsDeptCode",
-				type : "text",
-				style : "width:80px;",
-				value : ""
-			 }).appendTo(td);
-			td.appendTo(tr);
-		 var td = $("<td>");
-		 $("<input>").attr({
-				name : "fsLineMoney",
-				type : "text",
-				style : "width:50px;",
-				value : ""
-			 }).appendTo(td);
-			td.appendTo(tr);
-		 var td = $("<td>");
-		 $("<input>").attr({
-				name : "fsSubjectCode",
-				type : "text",
-				style : "width:50px;",
-				value : ""
-			 }).appendTo(td);
-			td.appendTo(tr);
-		 var td = $("<td>");
-		 $("<input>").attr({
-				name : "fsProductCode",
-				type : "text",
-				style : "width:50px;",
-				value : ""
-			 }).appendTo(td);
-			td.appendTo(tr);
-		 var td = $("<td>");
-		 $("<input>").attr({
-				name : "fsProjectCode",
-				type : "text",
-				style : "width:50px;",
-				value : ""
-			 }).appendTo(td);
-			td.appendTo(tr);
-		 var td = $("<td>");
-		 $("<input>").attr({
-				name : "fsCurrAccount",
-				type : "text",
-				style : "width:50px;",
-				value : ""
-			 }).appendTo(td);
-			td.appendTo(tr);
-		 var td = $("<td>");
-			 $("<input>").attr({
-					name : "fsRemark",
-					type : "text",
-					style : "width:50px;",
-					value : ""
-				 }).appendTo(td);
-				td.appendTo(tr);
-		 var td = $("<td>");
-		 $("<input>").attr({
-				name : "fsLineDescribe",
-				type : "text",
-				style : "width:50px;",
-				value : ""
-			 }).appendTo(td);
-			td.appendTo(tr);
-		 var td = $("<td>");
-		 $("<a href=\"javascript:void(0);\" onclick=\"deleteFsRow($(this));\">删除</a>").appendTo(td);
-			td.appendTo(tr);
-		 tr.appendTo("#fsTable");
-		 
-		 $("select[name='subSubjectName']").select2({
-				language : 'zh-CN',
-				minimumInputLength : 1, //至少输入n个字符，才去加载数据
-				maximumInputLength : 100,//限制最大字符，以防坑货
-				placeholder : "选择报销条目",
-				width : '200px',
-				allowClear : false,
-				multiple : false,
-				ajax : {
-					url : "<%=basePath%>/bx/queryBxItem.do",
-					dataType : "json",
-					delay : 250,
-					type:"POST",
-					data : function(params) {
-						return {
-							term : params.term
-						};
-					},
-					processResults : function(data, params) {
-						var parsed = data;
-						var arr = [];
-						for ( var x in parsed) {
-							arr.push(parsed[x]); //这个应该是个json对象
-						}
-						console.log(arr);
-						return {
-							results : arr
-						};
-					},
-					cache : true
-				}
-			}).on("select2:select", function (e) {
-				//
-			});
-		 
-	}
-	
-	function deleteFsRow(currobj){
-		currobj.parent().parent().remove();
 	}
 </script>
