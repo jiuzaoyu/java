@@ -72,9 +72,6 @@
 		<span>申辩</span>
 	</a>
     
-    
-    
-    
 </body>
 </html>
 
