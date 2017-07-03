@@ -35,26 +35,24 @@
         function showavermentDialog(billcode){
             //申辩的时候判断补提产假是否能申辩成功
 			if(flowSubject.indexOf("产假")>0){
-				$.ajax({
-  		   			url : "<%=basePath%>/attendance/leavebill/checkSupplementHardForExplain.do",
-  		   			type : "POST",
-  		   			async : false,
-  		   			dataType : "json",
-  		   			data : {
-  		   				billCode:billcode
-  		   			},
-  		   			cache : false,
-  		   			success : function(json) { 
-  		   				var status = json.status;
-  		   				var msg = json.message;
-  		   				if(status == "false"){   		   					
-  		   					alert_art(msg,"warning");
-  		   				}
-  		   			}
-  		   		});
-				
+			$.ajax({
+				url : "<%=basePath%>/attendance/leavebill/checkSupplementHardForExplain.do",
+				type : "POST",
+				async : false,
+				dataType : "json",
+				data : {
+					billCode:billcode
+				},
+				cache : false,
+				success : function(json) { 
+					var status = json.status;
+					var msg = json.message;
+					if(status == "false"){   		   					
+						alert_art(msg,"warning");
+					}
+				}
+			});
 			}
-            
         }
         
 	</script>
