@@ -15,7 +15,7 @@
 	<script src="<%=basePath%>/js/zTree/js/jquery.ztree.exhide-3.5.min.js"></script>
 </head>
 <body>
-	<!--功能说明：点击选择后出现弹框，弹框中是个子目的ztree树，可以根据所搜来获取不同的结果-->
+	<!--功能说明：点击选择后出现弹框，弹框中是个子目的ztree树，可以根据所搜来获取不同的结果,详细例子请参见erp的erp与oracle接口-->
 	
 	<a class="basic-btn gray-btn" onclick="iniSubSubjectTree()"><span>选择</span>
 	<!--子目树弹框 -->
