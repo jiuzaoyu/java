@@ -19,21 +19,21 @@ public class CopyOfStringUtil {
 	 * @return
 	 */
 	public static void unique(String [] arr){
-        //实例化一个set集合
-        Set<String> set = new HashSet<String>();
-        if(arr == null){
-        	return;
-        }
-        //遍历数组并存入集合,如果元素已存在则不会重复存入
-        for (int i = 0; i < arr.length; i++) {
-            set.add(arr[i]);
-            arr[i] = "";
-        }
+        	//实例化一个set集合
+        	Set<String> set = new HashSet<String>();
+        	if(arr == null){
+        		return;
+        	}
+       		//遍历数组并存入集合,如果元素已存在则不会重复存入
+		for (int i = 0; i < arr.length; i++) {
+		    set.add(arr[i]);
+		    arr[i] = "";
+		}
         
-        int j = 0;
-        for(String str : set){
-        	arr[j] = str;
-        	j++;
-        }
-    } 
+		int j = 0;
+		for(String str : set){
+			arr[j] = str;
+			j++;
+		}
+    	} 
 }
