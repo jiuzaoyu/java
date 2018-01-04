@@ -1,0 +1,9 @@
+fat-jar的安装：
+    Myeclipse8.5本身有一个打包的工具,但是不能将别的jar文件也一起打包进来. fat-jar能够很好的解决上述问题。
+    fat-jar它是sourceforge.net下的一个开源工具从http://sourceforge.net/projects/fjep地址可以下载该工具，下载完成后是一个zip压缩包，解压后将plugins
+文件夹下的net.sf.fjep.fatjar_0.0.27文件夹拷贝到Myeclipse8.5或者8.x的目录下的dropins文件夹下（例如，我用的是Myeclipse8.5，
+即在C:\Users\Administrator\AppData\Local\Genuitec\MyEclipse 8.5\dropins），然后直接启动myeclipse 右击项目,会发现该项目中已经集成了该插件 在启动
+后 右击工程就可以看到 Build Fat jar的选项 安装成功或者，点击Windows选项栏的Preferences选项，可以看到Fat Jar Preferences选项表示安装成功。
+
+fat-jar的使用：
+    见http://blog.csdn.net/csdn_20160128/article/details/78968142.
